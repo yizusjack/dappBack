@@ -63,7 +63,11 @@ def get_token():
         ##Comprueba que las credenciales coincidan
         if user and hashedPsswd == user.password:
             token = jwt.encode({'user': auth['username'], 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, os.getenv('API_KEY'))
-            return jsonify(token), 200
+            response = {
+                'message': 'Token generado con éxito',
+                'token': token
+            }
+            return jsonify(response), 200
         ##Si las credenciales no coinciden
         response = {
             'message': 'Sus credenciales no coinciden con nuestros registros'
