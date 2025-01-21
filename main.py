@@ -45,9 +45,9 @@ def token_required(f):
         try:
             jwt.decode(token, os.getenv('API_KEY'), algorithms="HS256")
         except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token has expired"}), 401
+            return jsonify({"error": "Token expirado"}), 401
         except jwt.InvalidTokenError:
-            return jsonify({"error": "Invalid token"}), 401
+            return jsonify({"error": "Token no válido"}), 401
         return f(*args, **kwargs)
     return decorated
 
@@ -84,7 +84,7 @@ def get_token():
 def get_ishihara():
     data = request.json
 
-    print(data['respuesta_1'])
+    print(data['respuestas'])
 
     response = {
         'message': 'Éxito'
