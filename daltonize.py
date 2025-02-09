@@ -18,7 +18,7 @@ def imageTransform(base64_image, tipo_daltonismo):
     im = Image.open(imageStream)
 
     if im.mode in ['1', 'L']:  # Imagen en escala de grises
-        return null
+        return None
 
     im = im.copy()
     im = im.convert('RGB')
@@ -37,6 +37,8 @@ def imageTransform(base64_image, tipo_daltonismo):
         lms2lms_deficit = protan
     elif tipo_daltonismo == 'Tritanopia':
         lms2lms_deficit = tritanope
+    else:
+        return None
 
     # Colorspace transformation matrices
     rgb2lms = numpy.array([[17.8824, 43.5161, 4.11935], [3.45565, 27.1554, 3.86714], [0.0299566, 0.184309, 1.46709]])
@@ -98,5 +100,5 @@ def imageTransform(base64_image, tipo_daltonismo):
     im_bytes = im_file.getvalue()
     convertedBase64 = base64.b64encode(im_bytes).decode("utf-8")
 
-    im_converted.show()
+    #im_converted.show()
     return convertedBase64

@@ -97,8 +97,15 @@ def get_ishihara():
 @token_required
 def transform_image():
     data = request.json
-    #print(data['tipo_daltonismo'])
+
     imagenTransformada = imageTransform(data['imagen'], data['tipo_daltonismo'])
+
+    if imagenTransformada == None:
+        response = {
+            'message': 'Imagen o tipo de daltonismo no válido',
+        }
+        return jsonify(response), 400
+
     response = {
         'message': 'Éxito',
         'imagenTransformada': imagenTransformada
