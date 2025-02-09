@@ -27,7 +27,16 @@ def imageTransform(base64_image, tipo_daltonismo):
     # lms2lms_deficit = numpy.array([[1,0,0],[0.494207,0,1.24827],[0,0,1]])
     # ver saturación de rojo, es mucha, mejor intentar balancear el verde
     # lms2lms_deficit = numpy.array([[1.135,-0.05,0],[0.469,0.22,1.05],[0,0,1]])
-    lms2lms_deficit = numpy.array([[1.135, -0.05, 0], [0.280085, 0.692501, 0.047413], [-0.011820, 0.042940, 0.968881]])
+    deutan = numpy.array([[1.135, -0.05, 0], [0.280085, 0.692501, 0.047413], [-0.011820, 0.042940, 0.968881]])
+    protan = numpy.array([[0,2.02344,-2.52581],[0,1,0],[0,0,1]])
+    tritanope = numpy.array([[1,0,0],[0,1,0],[-0.395913,0.801109,0]])
+
+    if tipo_daltonismo == 'Deuteranopia':
+        lms2lms_deficit = deutan
+    elif tipo_daltonismo == 'Protanopia':
+        lms2lms_deficit = protan
+    elif tipo_daltonismo == 'Tritanopia':
+        lms2lms_deficit = tritanope
 
     # Colorspace transformation matrices
     rgb2lms = numpy.array([[17.8824, 43.5161, 4.11935], [3.45565, 27.1554, 3.86714], [0.0299566, 0.184309, 1.46709]])
@@ -89,4 +98,5 @@ def imageTransform(base64_image, tipo_daltonismo):
     im_bytes = im_file.getvalue()
     convertedBase64 = base64.b64encode(im_bytes).decode("utf-8")
 
+    im_converted.show()
     return convertedBase64
