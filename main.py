@@ -108,7 +108,8 @@ def transform_image():
 
     response = {
         'message': 'Éxito',
-        'imagenTransformada': imagenTransformada
+        'imagenTransformada': imagenTransformada,
+        'imagenOriginal': data['imagen']
     }
     return jsonify(response), 200
 
