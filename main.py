@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from seeder import userSeed
 from models import User
 import hashlib
+from daltonize import imageTransform
 
 load_dotenv()
 
@@ -49,6 +50,7 @@ def token_required(f):
         except jwt.InvalidTokenError:
             return jsonify({"error": "Token no válido"}), 401
         return f(*args, **kwargs)
+    decorated.__name__ = f.__name__
     return decorated
 
 
@@ -88,6 +90,26 @@ def get_ishihara():
 
     response = {
         'message': 'Éxito'
+    }
+    return jsonify(response), 200
+
+@app.route('/transform-image', methods=['POST'])
+@token_required
+def transform_image():
+    data = request.json
+
+    imagenTransformada = imageTransform(data['imagen'], data['tipo_daltonismo'])
+
+    if imagenTransformada == None:
+        response = {
+            'message': 'Imagen o tipo de daltonismo no válido',
+        }
+        return jsonify(response), 400
+
+    response = {
+        'message': 'Éxito',
+        'imagenTransformada': imagenTransformada,
+        'imagenOriginal': data['imagen']
     }
     return jsonify(response), 200
 
