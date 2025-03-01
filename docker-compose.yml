@@ -9,15 +9,14 @@ services:
       ports:
         - 5000:5000
       depends_on:
-        - db
+        - db-back
       environment:
         SERVICE_NAME: flask
         SERVICE_TAGS: dev
       working_dir: /var/www
       networks:
         - app-network
-        - nginx-proxy
-    db:
+    db-back:
       image: 'mariadb:10.9.4'
       restart: unless-stopped
       tty: true
@@ -39,7 +38,7 @@ networks:
   default:
     name: nginx-proxy
   app-network:
-    driver: bridge
+    external: true
 volumes:
   dbdata:
     driver: local
