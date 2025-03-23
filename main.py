@@ -89,7 +89,8 @@ def get_ishihara():
     print(data['respuestas'])
 
     response = {
-        'message': 'Éxito'
+        'message': 'Éxito',
+        'tipo_daltonismo': 'Deuteranopia'
     }
     return jsonify(response), 200
 
