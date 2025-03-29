@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request
 import jwt
 import datetime
 import os
+
+from scipy.constants import value
+
 from config import config
 from models import db
 from dotenv import load_dotenv
@@ -10,6 +13,8 @@ from seeder import userSeed
 from models import User
 import hashlib
 from daltonize import imageTransform
+from naive import getResult
+import json
 
 load_dotenv()
 
@@ -85,12 +90,18 @@ def get_token():
 @token_required
 def get_ishihara():
     data = request.json
+    data_str = data["respuestas"]
+    data_list = json.loads(data_str)
+    respuestas = [str(item["valor"]) for item in data_list]
 
-    print(data['respuestas'])
+    print(data)
+    print(respuestas)
+
+    prediction = getResult(respuestas)
 
     response = {
         'message': 'Éxito',
-        'tipo_daltonismo': 'Deuteranopia'
+        'tipo_daltonismo': prediction
     }
     return jsonify(response), 200
 
