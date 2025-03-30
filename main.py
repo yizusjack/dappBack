@@ -94,8 +94,8 @@ def get_ishihara():
     data_list = json.loads(data_str)
     respuestas = [str(item["valor"]) for item in data_list]
 
-    print(data)
-    print(respuestas)
+    # print(data)
+    # print(respuestas)
 
     prediction = getResult(respuestas)
 
