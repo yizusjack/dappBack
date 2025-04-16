@@ -48,50 +48,24 @@ def imageTransform(base64_image, tipo_daltonismo):
     err2mod = numpy.array([[0, 0, 0], [0.7, 1, 0], [0.7, 0, 1]])
 
     # transformación a LMS (sistema de color que representa los conos del ojo)
-    LMS = numpy.zeros_like(RGB)
-    for i in range(RGB.shape[0]):
-        for j in range(RGB.shape[1]):
-            rgb = RGB[i, j, :3]  # obtiene los valores rgb del pixel actual
-            LMS[i, j, :3] = numpy.dot(rgb2lms,
-                                      rgb)  # transforma el pixel de rgb a lms al multiplicarlo por su matriz de transformacion
+    LMS = numpy.tensordot(RGB, rgb2lms.T, axes=([2], [0]))
 
     # calcular la imagen bajo la vista daltónica
-    _LMS = numpy.zeros_like(RGB)
-    for i in range(RGB.shape[0]):
-        for j in range(RGB.shape[1]):
-            lms = LMS[i, j, :3]
-            _LMS[i, j, :3] = numpy.dot(lms2lms_deficit, lms)
+    _LMS = numpy.tensordot(LMS, lms2lms_deficit.T, axes=([2], [0]))
 
-    _RGB = numpy.zeros_like(RGB)
-    for i in range(RGB.shape[0]):
-        for j in range(RGB.shape[1]):
-            _lms = _LMS[i, j, :3]
-            _RGB[i, j, :3] = numpy.dot(lms2rgb, _lms)
+    # Convertir de regreso a RGB
+    _RGB = numpy.tensordot(_LMS, lms2rgb.T, axes=([2], [0]))
 
     # calcula el error entre la imagen original y la imagen transformada
     error = (RGB - _RGB)
 
     # daltonización
-    ERR = numpy.zeros_like(RGB)
-    for i in range(RGB.shape[0]):
-        for j in range(RGB.shape[1]):
-            err = error[i, j, :3]
-            ERR[i, j, :3] = numpy.dot(err2mod, err)
+    ERR = numpy.tensordot(error, err2mod.T, axes=([2], [0]))
 
     dtpm = ERR + RGB  # suma la matriz original con la matriz de error
 
     # ajusta los valores para que estén entre 0 y 255
-    for i in range(RGB.shape[0]):
-        for j in range(RGB.shape[1]):
-            dtpm[i, j, 0] = max(0, dtpm[i, j, 0])
-            dtpm[i, j, 0] = min(255, dtpm[i, j, 0])
-            dtpm[i, j, 1] = max(0, dtpm[i, j, 1])
-            dtpm[i, j, 1] = min(255, dtpm[i, j, 1])
-            dtpm[i, j, 2] = max(0, dtpm[i, j, 2])
-            dtpm[i, j, 2] = min(255, dtpm[i, j, 2])
-
-    # redondea valores
-    result = dtpm.astype('uint8')
+    result = numpy.clip(dtpm, 0, 255).astype('uint8')
 
     # genera imagen transformada
     im_converted = Image.fromarray(result, mode='RGB')
