@@ -8,11 +8,14 @@ services:
       tty: true
       ports:
         - 5000:5000
+      volumes:
+        - .:/var/www
       depends_on:
         - db-back
       environment:
         SERVICE_NAME: flask
         SERVICE_TAGS: dev
+        FLASK_ENV: development
       working_dir: /var/www
       networks:
         - app-network
