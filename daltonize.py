@@ -12,7 +12,7 @@ def getImage(base64_image):
 
     return imageStream
 
-def imageTransform(base64_image, tipo_daltonismo):
+def imageTransform(base64_image, tipo_daltonismo, simulacion):
     imageStream = getImage(base64_image)
 
     im = Image.open(imageStream)
@@ -24,9 +24,6 @@ def imageTransform(base64_image, tipo_daltonismo):
     im = im.convert('RGB')
     RGB = numpy.asarray(im, dtype=float)
 
-    # lms2lms_deficit = numpy.array([[1,0,0],[0.494207,0,1.24827],[0,0,1]])
-    # ver saturación de rojo, es mucha, mejor intentar balancear el verde
-    # lms2lms_deficit = numpy.array([[1.135,-0.05,0],[0.469,0.22,1.05],[0,0,1]])
     deutan = numpy.array([[1.135, -0.05, 0], [0.280085, 0.692501, 0.047413], [-0.011820, 0.042940, 0.968881]])
     protan = numpy.array([[0,2.02344,-2.52581],[0,1,0],[0,0,1]])
     tritanope = numpy.array([[1,0,0],[0,1,0],[-0.395913,0.801109,0]])
@@ -56,13 +53,19 @@ def imageTransform(base64_image, tipo_daltonismo):
     # Convertir de regreso a RGB
     _RGB = numpy.tensordot(_LMS, lms2rgb.T, axes=([2], [0]))
 
-    # calcula el error entre la imagen original y la imagen transformada
-    error = (RGB - _RGB)
+    #Si se busca simular el daltonismo la imagen se retorna a RGB
+    if(simulacion):
+        dtpm = _RGB
+    
+    else:
 
-    # daltonización
-    ERR = numpy.tensordot(error, err2mod.T, axes=([2], [0]))
+        # calcula el error entre la imagen original y la imagen transformada
+        error = (RGB - _RGB)
 
-    dtpm = ERR + RGB  # suma la matriz original con la matriz de error
+        # daltonización
+        ERR = numpy.tensordot(error, err2mod.T, axes=([2], [0]))
+
+        dtpm = ERR + RGB  # suma la matriz original con la matriz de error
 
     # ajusta los valores para que estén entre 0 y 255
     result = numpy.clip(dtpm, 0, 255).astype('uint8')
@@ -74,5 +77,4 @@ def imageTransform(base64_image, tipo_daltonismo):
     im_bytes = im_file.getvalue()
     convertedBase64 = base64.b64encode(im_bytes).decode("utf-8")
 
-    #im_converted.show()
     return convertedBase64
