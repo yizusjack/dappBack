@@ -110,7 +110,7 @@ def get_ishihara():
 def transform_image():
     data = request.json
 
-    imagenTransformada = imageTransform(data['imagen'], data['tipo_daltonismo'])
+    imagenTransformada = imageTransform(data['imagen'], data['tipo_daltonismo'], data['simulacion'])
 
     if imagenTransformada == None:
         response = {
