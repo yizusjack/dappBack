@@ -2,6 +2,7 @@ import base64
 import numpy
 from PIL import Image
 from io import BytesIO
+import piexif
 
 def getImage(base64_image):
     if "data:image" in base64_image:
@@ -17,8 +18,16 @@ def imageTransform(base64_image, tipo_daltonismo, simulacion):
 
     im = Image.open(imageStream)
 
-    if im.mode in ['1', 'L']:  # Imagen en escala de grises
-        return None
+    exif_bytes = None
+
+    if "exif" in im.info:
+        exif_dict = piexif.load(im.info['exif'])
+
+        if piexif.ImageIFD.Orientation in exif_dict['0th']:
+            # quick and dirty work around to avoid type error
+            exif_dict['Exif'][41729] = b'1'
+
+            exif_bytes = piexif.dump(exif_dict)
 
     im = im.copy()
     im = im.convert('RGB')
@@ -73,7 +82,11 @@ def imageTransform(base64_image, tipo_daltonismo, simulacion):
     # genera imagen transformada
     im_converted = Image.fromarray(result, mode='RGB')
     im_file = BytesIO()
-    im_converted.save(im_file, format="JPEG")
+
+    if exif_bytes:
+        im_converted.save(im_file, format="JPEG", exif=exif_bytes)
+    else:
+        im_converted.save(im_file, format="JPEG")
     im_bytes = im_file.getvalue()
     convertedBase64 = base64.b64encode(im_bytes).decode("utf-8")
 
